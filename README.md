@@ -3,6 +3,8 @@ Port of the Bolus theme for Alkaline to Lithium for iOS. Color and standard vers
 
 Original source is in `.original.js` files.
 
+Battery theme can be [previewed here.](http://wchill.github.io/bolus-lithium/preview.html)
+
 ## Compilation
 
 Remove the function signature and brackets, then test using https://supermamon.github.io/Lithium/ThemeMaker.html
