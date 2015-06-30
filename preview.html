@@ -1,0 +1,495 @@
+<html>
+
+<head>
+	<title>Lithium Theme Previewer</title>
+	<style type="text/css">
+		* {
+			font-family: 'Helvetica';
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		h2 {
+			display: inline;
+			font-size: 1.5em;
+			margin-top: 0em;
+			margin-bottom: 0em;
+		}
+
+		td {
+			font-size: 0.8em;
+		}
+
+		#code {
+			/*text area*/
+			font-family: 'Consolas', 'Courier New', 'Courier', 'monospace';
+			font-size: 9pt;
+			border: 1px solid Black;
+			border-top: 0px;
+			width='100%';
+		}
+
+		#divCode {
+			/*function header*/
+			font-family: 'Consolas', 'Courier New', 'Courier', 'monospace';
+			font-size: 9pt;
+			border: 1px solid Black;
+			border-bottom: 0px;
+			background-color: #ddd;
+		}
+
+		sup {
+			font-size: 0.75em;
+		}
+
+		div.statusBar {
+			border: 1px solid #CCC;
+			width: 500px;
+			min-width: 250px;
+		}
+
+		img.battery {
+			position: relative;
+			top: 50%;
+			transform: translateY(-50%);
+			-webkit-transform: translateY(-50%);
+		}
+
+		#help {
+			font-family: 'Helvetica', 'Arial', 'Tahoma', 'sans-serif';
+			font-size: 8pt;
+		}
+
+		#changelog {
+			padding-top: 8pt;
+			font-family: 'Helvetica', 'Arial', 'Tahoma', 'sans-serif';
+			font-size: 8pt;
+			height: 80px;
+			overflow: Auto;
+		}
+
+		#changelog p {
+			margin-top: 0em;
+			margin-bottom: 0em;
+		}
+	</style>
+	<script language="javascript">
+		var tints = [];
+		tints['White'] = {
+			name: 'White',
+			backgroundColor: '#FFF',
+			tint: '0,0,0'
+		};
+		tints['Black'] = {
+			name: 'Black',
+			backgroundColor: '#000',
+			tint: '255,255,255'
+		};
+		tints['Facebook'] = {
+			name: 'Facebook',
+			backgroundColor: '#3b5998',
+			tint: '255,255,255'
+		};
+		tints['Twitter'] = {
+			name: 'Twitter',
+			backgroundColor: '#00aced',
+			tint: '255,255,255'
+		};
+		tints['Evernote'] = {
+			name: 'Evernote',
+			backgroundColor: '#6FB536',
+			tint: '0,0,0'
+		};
+		tints['Instagram'] = {
+			name: 'Instagram',
+			backgroundColor: '#517fa4',
+			tint: '255,255,255'
+		};
+		tints['LinkedIn'] = {
+			name: 'LinkedIn',
+			backgroundColor: '#007bb6',
+			tint: '255,255,255'
+		};
+		tints['Viber'] = {
+			name: 'Viber',
+			backgroundColor: '#783cbd',
+			tint: '255,255,255'
+		};
+		tints['Transparent'] = {
+			name: 'Transparent',
+			backgroundColor: '#000',
+			tint: '255,255,255'
+		};
+
+		var bolusScript = function(height, percentage, charging, low, color) {
+			var emptyBarCanvas = document.createElement("canvas"),
+				emptyBarContext = emptyBarCanvas.getContext("2d"),
+				emptyBarData,
+				fullBarCanvas = document.createElement("canvas"),
+				fullBarContext = fullBarCanvas.getContext("2d"),
+				fullBarData,
+				finalCanvas = document.createElement("canvas"),
+				finalContext = finalCanvas.getContext("2d"),
+				barWidth = height * 1.25,
+				radius = Math.round(height / 6) / 2.0,
+				padding = Math.round(height / 8),
+				totalWidth = barWidth + (charging ? Math.round(0.3 * height) + 2 * padding : padding),
+				colorString = "rgb(" + color.join() + ")",
+				colorStringAlpha = "rgba(" + color.join() + ",0.3)",
+				barData;
+			finalCanvas.width = totalWidth;
+			finalCanvas.height = height;
+			emptyBarCanvas.width = barWidth;
+			emptyBarCanvas.height = height;
+			fullBarCanvas.width = barWidth;
+			fullBarCanvas.height = height;
+
+			function drawPath(ctx) {
+				ctx.beginPath();
+				ctx.arc(radius, height / 2, radius, 0.5 * Math.PI, 1.5 * Math.PI);
+				ctx.lineTo(barWidth - radius / 2, height / 2 - radius);
+				ctx.arc(barWidth - radius, height / 2, radius, 1.5 * Math.PI, 0.5 * Math.PI);
+				ctx.lineTo(radius / 2, height / 2 + radius);
+				ctx.clip();
+			}
+
+			drawPath(emptyBarContext);
+			emptyBarContext.fillStyle = colorStringAlpha;
+			emptyBarContext.fill();
+			if (charging) fullBarContext.fillStyle = "#4CD964";
+			else if (low) fullBarContext.fillStyle = "#FF3B30";
+			else fullBarContext.fillStyle = colorString;
+			drawPath(fullBarContext);
+			fullBarContext.fill();
+			fullBarData = fullBarContext.getImageData(0, 0, barWidth, height);
+			finalContext.putImageData(fullBarData, 0, 0);
+			barData = emptyBarContext.getImageData(barWidth * (percentage / 100), 0, barWidth, height);
+			finalContext.putImageData(barData, barWidth * (percentage / 100), 0);
+
+			if (charging) {
+				var lightningCanvas = document.createElement("canvas");
+				var lightningContext = lightningCanvas.getContext("2d");
+				var lightningBase = 0.75 * height;
+				lightningCanvas.width = Math.round(0.4 * lightningBase);
+				lightningCanvas.height = Math.round(0.7 * lightningBase);
+				lightningContext.strokeStyle = colorString;
+				lightningContext.fillStyle = colorString;
+				lightningContext.beginPath();
+				lightningContext.moveTo(Math.round(0.3 * lightningBase), 0);
+				lightningContext.lineTo(Math.round(0.2 * lightningBase), Math.round(0.3 * lightningBase));
+				lightningContext.lineTo(Math.round(0.4 * lightningBase), Math.round(0.3 * lightningBase));
+				lightningContext.lineTo(Math.round(0.1 * lightningBase), Math.round(0.7 * lightningBase));
+				lightningContext.lineTo(Math.round(0.2 * lightningBase), Math.round(0.4 * lightningBase));
+				lightningContext.lineTo(0, Math.round(0.4 * lightningBase));
+				lightningContext.closePath();
+				lightningContext.stroke();
+				lightningContext.clip();
+				lightningContext.fill();
+				var lightningData = lightningContext.getImageData(0, 0, lightningCanvas.width, lightningCanvas.height);
+				finalContext.putImageData(lightningData, barWidth + padding, height / 2 - lightningCanvas.height / 2);
+			}
+
+			return finalCanvas.toDataURL("image/png");
+		};
+
+		var bolusColorScript = function(height, percentage, charging, low, color) {
+			var emptyBarCanvas = document.createElement("canvas"),
+				emptyBarContext = emptyBarCanvas.getContext("2d"),
+				emptyBarData,
+				fullBarCanvas = document.createElement("canvas"),
+				fullBarContext = fullBarCanvas.getContext("2d"),
+				fullBarData,
+				finalCanvas = document.createElement("canvas"),
+				finalContext = finalCanvas.getContext("2d"),
+				barWidth = height * 1.25,
+				radius = Math.round(height / 6) / 2.0,
+				padding = Math.round(height / 8),
+				totalWidth = barWidth + (charging ? Math.round(0.3 * height) + 2 * padding : padding),
+				colorString = "rgb(" + color.join() + ")",
+				colorStringAlpha = "rgba(" + color.join() + ",0.3)",
+				barData;
+			finalCanvas.width = totalWidth;
+			finalCanvas.height = height;
+			emptyBarCanvas.width = barWidth;
+			emptyBarCanvas.height = height;
+			fullBarCanvas.width = barWidth;
+			fullBarCanvas.height = height;
+
+			function drawPath(ctx) {
+				ctx.beginPath();
+				ctx.arc(radius, height / 2, radius, 0.5 * Math.PI, 1.5 * Math.PI);
+				ctx.lineTo(barWidth - radius / 2, height / 2 - radius);
+				ctx.arc(barWidth - radius, height / 2, radius, 1.5 * Math.PI, 0.5 * Math.PI);
+				ctx.lineTo(radius / 2, height / 2 + radius);
+				ctx.clip();
+			}
+
+			drawPath(emptyBarContext);
+			emptyBarContext.fillStyle = colorStringAlpha;
+			emptyBarContext.fill();
+			if (charging || percentage >= 80) fullBarContext.fillStyle = "#4CD964";
+			else if (percentage <= 10) fullBarContext.fillStyle = "#FF3B30";
+			else if (percentage <= 20) fullBarContext.fillStyle = "#FF8E2B";
+			else if (percentage <= 40) fullBarContext.fillStyle = "#FFD800";
+			else fullBarContext.fillStyle = colorString;
+			drawPath(fullBarContext);
+			fullBarContext.fill();
+			fullBarData = fullBarContext.getImageData(0, 0, barWidth, height);
+			finalContext.putImageData(fullBarData, 0, 0);
+			barData = emptyBarContext.getImageData(barWidth * (percentage / 100), 0, barWidth, height);
+			finalContext.putImageData(barData, barWidth * (percentage / 100), 0);
+
+			if (charging) {
+				var lightningCanvas = document.createElement("canvas");
+				var lightningContext = lightningCanvas.getContext("2d");
+				var lightningBase = 0.75 * height;
+				lightningCanvas.width = Math.round(0.4 * lightningBase);
+				lightningCanvas.height = Math.round(0.7 * lightningBase);
+				lightningContext.strokeStyle = colorString;
+				lightningContext.fillStyle = colorString;
+				lightningContext.beginPath();
+				lightningContext.moveTo(Math.round(0.3 * lightningBase), 0);
+				lightningContext.lineTo(Math.round(0.2 * lightningBase), Math.round(0.3 * lightningBase));
+				lightningContext.lineTo(Math.round(0.4 * lightningBase), Math.round(0.3 * lightningBase));
+				lightningContext.lineTo(Math.round(0.1 * lightningBase), Math.round(0.7 * lightningBase));
+				lightningContext.lineTo(Math.round(0.2 * lightningBase), Math.round(0.4 * lightningBase));
+				lightningContext.lineTo(0, Math.round(0.4 * lightningBase));
+				lightningContext.closePath();
+				lightningContext.stroke();
+				lightningContext.clip();
+				lightningContext.fill();
+				var lightningData = lightningContext.getImageData(0, 0, lightningCanvas.width, lightningCanvas.height);
+				finalContext.putImageData(lightningData, barWidth + padding, height / 2 - lightningCanvas.height / 2);
+			}
+
+			return finalCanvas.toDataURL("image/png");
+		}
+
+		var themeSamples = {};
+		var renderBattery = bolusColorScript;
+		themeSamples['Bolus'] = bolusScript;
+		themeSamples['BolusColor'] = bolusColorScript;
+		themeSamples['Custom'] = "";
+
+		function settingsChange() {
+			var sourceElem = document.getElementById('code');
+			var code = sourceElem.value;
+			if (!sourceElem.readOnly) {
+				renderBattery = new Function('height', 'percentage', 'charging', 'low', 'color', code);
+			}
+
+			var statusBackground = document.getElementById('cboBackground').options[document.getElementById('cboBackground').selectedIndex].value;
+			var statusBackgroundColor = tints[statusBackground].backgroundColor;
+			var backgroundImage;
+			if (tints[statusBackground].name == 'Transparent') {
+				backgroundImage = "url('" + document.getElementById('txtWallpaper').value + "')";
+			} else {
+				backgroundImage = null;
+			}
+
+			var isCustomTint = document.getElementById('isCustomTint').checked;
+
+			if (!isCustomTint) {
+				document.getElementById('txtColor').value = tints[statusBackground].tint;
+			}
+
+			var colors = document.getElementById('txtColor').value;
+			var colors = colors.split(',');
+
+			var height = document.getElementById('cboHeight').options[document.getElementById('cboHeight').selectedIndex].value;
+			var isCharging = document.getElementById('isCharging').checked;
+			var isLow = document.getElementById('isLow').checked;
+
+			var percs = [5, 10, 20, 30, 40, 50, 75, 100];
+
+			var samples = document.getElementById('samples');
+
+			for (var i = 0; i < percs.length; i++) {
+				var div = document.getElementById('div' + percs[i]);
+				var img = document.getElementById('img' + percs[i]);
+
+				if (!div) {
+
+					div = document.createElement("div");
+					div.setAttribute('id', 'div' + percs[i]);
+					div.setAttribute('class', 'statusBar');
+
+					if (i > 0) {
+						samples.appendChild(document.createElement('br'));
+					}
+
+					samples.appendChild(div);
+
+				}
+				div.style.height = height + 'px';
+				if (backgroundImage) {
+					div.style.backgroundImage = backgroundImage;
+				} else {
+					div.style.backgroundColor = statusBackgroundColor;
+					div.style.backgroundImage = null;
+				}
+
+				if (!img) {
+					img = document.createElement("img");
+					img.setAttribute('id', 'img' + percs[i]);
+					img.setAttribute('align', 'right');
+					img.setAttribute('class', 'battery');
+					div.appendChild(img);
+					div.appendChild(document.createTextNode(' '));
+
+				}
+				img.setAttribute('src', renderBattery(height, percs[i], isCharging, isLow, colors));
+			}
+		}
+
+		function init() {
+
+			var cbo = document.getElementById('sampleChooser');
+
+			for (var key in themeSamples) {
+				if (themeSamples.hasOwnProperty(key)) {
+					var newOpt = document.createElement('option');
+					newOpt.text = key;
+					newOpt.value = themeSamples[key].toString();
+					cbo.add(newOpt);
+				}
+			}
+
+			cbo = document.getElementById('cboBackground');
+			for (itint in tints) {
+				var newOpt = document.createElement('option');
+				newOpt.text = tints[itint].name;
+				newOpt.value = tints[itint].name;
+				cbo.add(newOpt);
+			}
+
+			loadCode();
+
+		}
+
+		function loadCode() {
+			var sampleChooser = document.getElementById('sampleChooser');
+			var selectedCode = sampleChooser.options[sampleChooser.selectedIndex].text;
+
+			var code = themeSamples[selectedCode].toString();
+			var sourceElem = document.getElementById('code');
+			if (code) {
+				sourceElem.value = code.replace("function (height, percentage, charging, low, color) {", "(height, percentage, charging, low, color)\n{");
+				sourceElem.readOnly = true;
+				renderBattery = themeSamples[selectedCode];
+			} else {
+				sourceElem.value = unescape(code);
+				sourceElem.readOnly = false;
+			}
+
+			settingsChange();
+		}
+	</script>
+</head>
+
+<body>
+	<h2>Lithium Theme Preview</h2>
+	<br> Adapted from <a href="https://supermamon.github.io/Lithium/ThemeMaker.html">Lithium Theme Editor</a> by <a href="https://twitter.com/supermamon/">@supermamon</a>
+	<br>
+	<table width="100%" border="0">
+		<tr>
+			<td>
+				<b>Sample Code:</b>
+				<select id="sampleChooser" onchange="loadCode()"></select>
+			</td>
+			<td>
+				<b>Preview:</b>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<hr>
+			</td>
+			<td>
+				<hr>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" width="30%">
+				<div id="divCode">function renderBattery</div>
+				<textarea id="code" rows="40" cols="100" onkeyup="settingsChange()"></textarea>
+			</td>
+			<td valign="top" align="left" width="50%">
+				<table border="0" align="center">
+					<tr>
+						<td valign="middle">Status Background</td>
+						<td>
+							<select id="cboBackground" onchange="settingsChange();" />
+						</td>
+					</tr>
+					<tr>
+						<td valign="middle">Status Height</td>
+						<td>
+							<select id="cboHeight" onchange="settingsChange()">
+								<option value="20">20</option>
+								<option value="40" selected>40</option>
+								<option value="48">48</option>
+								<option value="60">60</option>
+								<option value="72">72</option>
+							</select>
+							<br>
+							<sup>This is the height of the status bar</sup>
+						</td>
+					</tr>
+					<tr>
+						<td>Battery Charging</td>
+						<td>
+							<input id="isCharging" type="checkBox" onclick="settingsChange()">
+							<br>
+							<sup>Tick this to see how it looks like when charging</sup>
+						</td>
+					</tr>
+					<tr>
+						<td>Battery Low</td>
+						<td>
+							<input id="isLow" type="checkBox" onclick="settingsChange()">
+
+							<br>
+							<sup>Tick this to see how it looks like when battery is low</sup>
+						</td>
+					</tr>
+					<tr>
+						<td>System Tint</td>
+						<td>
+							<input id="txtColor" type="text" value="0,0,0" onchange="settingsChange()">
+							<input id="isCustomTint" type="checkBox" onclick="settingsChange()">Use Custom
+							<br>
+							<sup>Separate the values comma. This is the system tint. Some tweaks like Eclipse can change this.</sup>
+						</td>
+					</tr>
+					<tr>
+						<td>Wallpaper</td>
+						<td>
+							<input id="txtWallpaper" type="text" size="50" onchange="settingsChange()" value="https://raw.githubusercontent.com/supermamon/supermamon.github.io/master/Lithium/images/os_x_mountain_lion.png">
+							<br>
+							<sup>Only applies when Transparent background is selected. You can specify the full URL here.<br>
+							Doesn't detect light or dark wallpapers. Assumes dark. Set Custom System tint (0,0,0) to simulate light wallpaper.</sup>
+						</td>
+						<br>
+						</sup>
+					</tr>
+					<tr>
+						<td valign="top" colspan="2">What it looks like</td>
+					</tr>
+					<tr>
+						<td id="samples" colspan="2"></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<script language="javascript">
+		init();
+		settingsChange();
+	</script>
+
+</body>
+
+</html>
