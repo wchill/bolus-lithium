@@ -9,7 +9,8 @@ function renderBattery(height, percentage, charging, low, color) {
         finalContext = finalCanvas.getContext("2d"),
         barWidth = height * 1.25,
         radius = Math.round(height / 6) / 2.0,
-        totalWidth = barWidth + (charging ? Math.round(0.3 * height) + 10 : 5),
+        padding = Math.round(height / 8),
+        totalWidth = barWidth + (charging ? Math.round(0.3 * height) + 2 * padding : padding),
         colorString = "rgb(" + color.join() + ")",
         colorStringAlpha = "rgba(" + color.join() + ",0.3)",
         barData;
@@ -64,7 +65,7 @@ function renderBattery(height, percentage, charging, low, color) {
         lightningContext.clip();
         lightningContext.fill();
         var lightningData = lightningContext.getImageData(0, 0, lightningCanvas.width, lightningCanvas.height);
-        finalContext.putImageData(lightningData, barWidth + 5, height / 2 - lightningCanvas.height / 2);
+        finalContext.putImageData(lightningData, barWidth + padding, height / 2 - lightningCanvas.height / 2);
     }
 
     return finalCanvas.toDataURL("image/png");
